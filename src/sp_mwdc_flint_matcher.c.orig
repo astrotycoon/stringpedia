@@ -1,0 +1,109 @@
+/*
+ * flint.c
+ *
+ *  Created on: 14 Jul 2010
+ *      Author: ben
+ */
+
+#include "sp_mwdc_flint_matcher.h"
+
+void sp_mwdc_match_with_flint(char *text, char *pattern,char wildCardChar,int n, int m,
+		int *numMatches, struct SP_MWDC_MATCHING_POSITIONS *listOfMatches, unsigned int flags){
+
+	//set variable for flags
+	short firstMatchOnly = (flags & SP_MWDC_FIRST_MATCH_ONLY) ? 1 : 0;
+
+	matchWithFlint_Internal(text,pattern,wildCardChar,n,m,firstMatchOnly,numMatches,listOfMatches);
+}
+
+void matchWithFlint_Internal(char *text, char *pattern,char wildCardChar,int n, int m,
+		short firstMatchOnly, int *numMatches, struct SP_MWDC_MATCHING_POSITIONS *listOfMatches){
+
+	int i;
+	/*Create polynomials for the text, the text squared and the text cubed*/
+	fmpz_poly_t t,tsquared,tcubed;
+	fmpz_poly_init(t);
+	fmpz_poly_init(tsquared);
+	fmpz_poly_init(tcubed);
+
+	/* We know the length of the polynomials, so allocate space for them */
+	/* This should be quicker than the library re-allocating space on-demand */
+	fmpz_poly_fit_length(t,n);
+	fmpz_poly_fit_length(tsquared,n);
+	fmpz_poly_fit_length(tcubed,n);
+
+	/*Set the values of the coefficients of each polynomial*/
+	for(i=0; i<n; i++){
+		/*We assign any wildcards the value 0 as per the algorithm definition */
+		unsigned long value = (text[i]==wildCardChar) ? 0 : (unsigned long) text[i];
+		fmpz_poly_set_coeff_ui(t,(unsigned long)i,value);
+		fmpz_poly_set_coeff_ui(tsquared,(unsigned long)i,value*value);
+		fmpz_poly_set_coeff_ui(tcubed,(unsigned long)i,value*value*value);
+	}
+
+	/* Repeat for pattern, except we reverse the pattern to obtain a convolution */
+
+	fmpz_poly_t p,psquared,pcubed;
+	fmpz_poly_init(p);
+	fmpz_poly_init(psquared);
+	fmpz_poly_init(pcubed);
+
+	fmpz_poly_fit_length(p,m);
+	fmpz_poly_fit_length(psquared,m);
+	fmpz_poly_fit_length(pcubed,m);
+
+	for(i=0; i<m; i++){
+		unsigned long value = (pattern[m-i-1]==wildCardChar) ? 0 : (unsigned long) pattern[m-i-1];
+		fmpz_poly_set_coeff_ui(p,(unsigned long)i,value);
+		fmpz_poly_set_coeff_ui(psquared,(unsigned long)i,value*value);
+		fmpz_poly_set_coeff_ui(pcubed,(unsigned long)i,value*value*value);
+	}
+
+	/*Create the polynomials for p^3*T, p^2*t^2 and p*t^3 */
+
+	fmpz_poly_t pCubedTimesT,pSquaredTimesTSquared,pTimesTCubed;
+
+	fmpz_poly_init(pCubedTimesT);
+	fmpz_poly_init(pSquaredTimesTSquared);
+	fmpz_poly_init(pTimesTCubed);
+
+	/*Note we will only use the first n low-order coefficients in the result, so
+	 * use the truncation method which may be more efficient (and will use less space)*/
+	fmpz_poly_mul_trunc_n(pCubedTimesT,pcubed,t,n);
+	fmpz_poly_mul_trunc_n(pSquaredTimesTSquared,psquared,tsquared,n);
+	fmpz_poly_mul_trunc_n(pTimesTCubed,p,tcubed,n);
+
+	/* Print the matches
+	 * loop over each possible start index and test the formula*/
+	for(i=0;i<=n-m;i++){
+		unsigned long result = fmpz_poly_get_coeff_ui(pCubedTimesT,m+i-1) -
+				2*fmpz_poly_get_coeff_ui(pSquaredTimesTSquared,m+i-1) + fmpz_poly_get_coeff_ui(pTimesTCubed,m+i-1);
+		if(result == 0.0){
+			(*numMatches)++;
+			if(listOfMatches != NULL){
+				sp_mwdc_addToListOfMatches(listOfMatches,i);
+			}else{
+				printf("Match at index %d\n",i);
+			}
+			if(firstMatchOnly){
+				return;
+			}
+		}
+	}
+
+	/*Free the created polynomials*/
+	fmpz_poly_clear(t);
+	fmpz_poly_clear(tsquared);
+	fmpz_poly_clear(tcubed);
+	fmpz_poly_clear(p);
+	fmpz_poly_clear(psquared);
+	fmpz_poly_clear(pcubed);
+	fmpz_poly_clear(pCubedTimesT);
+	fmpz_poly_clear(pSquaredTimesTSquared);
+	fmpz_poly_clear(pTimesTCubed);
+}
+
+void matchWithFlint(char *text, char *pattern,char wildCardChar,int n, int m,
+		int *numMatches, struct SP_MWDC_MATCHING_POSITIONS *listOfMatches){
+	matchWithFlint_Internal(text,pattern,wildCardChar,n,m,0,numMatches,listOfMatches);
+}

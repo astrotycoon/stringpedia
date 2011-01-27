@@ -1,0 +1,29 @@
+/*
+ * flint.h
+ *
+ *  Created on: 14 Jul 2010
+ *      Author: ben
+ */
+
+#ifndef FLINT_H_
+#define FLINT_H_
+
+#include <flint.h>
+#include <mpz_poly.h>
+#include <fmpz_poly.h>
+#include <memory-manager.h>
+#include <ZmodF_poly.h>
+#include <test-support.h>
+#include <zmod_poly.h>
+#include "sp_mwdc.h"
+
+void sp_mwdc_match_with_flint(char *text, char *pattern,char wildCardChar,int n, int m,
+		int *numMatches, struct SP_MWDC_MATCHING_POSITIONS *listOfMatches, unsigned int flags);
+
+void matchWithFlint_Internal(char *text, char *pattern,char wildCardChar,int n, int m,
+		short firstMatchOnly, int *numMatches, struct SP_MWDC_MATCHING_POSITIONS *listOfMatches);
+
+void matchWithFlint(char *text, char *pattern,char wildCardChar,int n, int m,
+		int *numMatches, struct SP_MWDC_MATCHING_POSITIONS *listOfMatches);
+
+#endif /* FLINT_H_ */

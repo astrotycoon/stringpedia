@@ -1,0 +1,163 @@
+==============================================
+|               INSTALLATION                 |
+==============================================
+
+Dependencies:   
+	FFTW 3.2 (http://www.ffftw.org)
+	FLINT 1.5 (http://www.flintlib.org/) -- optional
+	
+Run: make or 
+     make-noflint if you do have have FLINT installed
+     
+Run make clean to remove all generated files
+     
+
+==============================================
+|             Provided Programs              |
+==============================================
+
+There are two 'harnesses' provided, which read input from a text file and
+take command line parameters. These will print results and timing information.
+They will be build into this directory when you run make.
+
+They are: sp_mwdc_harness (Matching With Don't Cares) and,
+          sp_km_harness   (K-Mismatches)
+          
+Run the programs for usage instructions
+
+In addition, the program sp_create_input will also be built in this directory,
+which aids the construction of input files from another source file. Once
+again, run for usage instructions.
+
+Finally, two simple examples with source code are build and provided in
+examples/
+
+==============================================
+|             Generating Wisdom              |
+==============================================
+
+It is recommended you run wisdomgenerator.sh before using the rest of the 
+code, as this will start generate FFTW wisdom. Note that this is a very 
+time intensive process and terminating early will result in FFTW loosing
+all aquired wisdom. This will be improved in future releases. Run
+wisdomgenerator.sh for more information.
+
+
+==============================================
+|                 Usage                      |
+==============================================
+
+To use the souce, you will need to:
+    include the file: include/stringpedia.h
+    Link to the library: lib/libstringpedia.a
+    
+Following is a list of functions you may interface with:
+
+Matching With Don't Cares
+=========================
+
+void sp_mwdc_match_naively();
+void sp_mwdc_match_with_fftw();
+void sp_mwdc_match_with_fftw_randomized();
+void sp_mwdc_match_with_flint();
+
+These all take the following parameters:
+
+char *text:   The text you wish to find matches in
+
+char *pattern: The pattern you wish to search for
+
+int n: The length of the text
+
+int m: The length of the pattern
+
+int *numMatches: A pointer to an integer to store the number of results found
+
+struct SP_MWDC_MATCHING_POSITIONS *listOfMatches: A linked list of integers
+in which to store the results. Pass NULL to print matching locations instead.
+The examples detailed above show how to use this.
+
+unsigned int flags: A bitwise OR of operational flags. Valid flags depend on
+the particular matching:
+
+all:
+	SP_MWDC_FIRST_MATCH_ONLY - Stop after the first found match
+
+
+sp_mwdc_match_naively():
+
+	SP_MWDC_DO_NAIVE_CONVOLUTIONS - Naively compute convolutions rather than the
+	standard naive method. Academic interest to compare to FLINT library only.
+	
+sp_mwdc_match_with_fftw() : 
+
+	SP_MWDC_NLOGM              - Use the n log n algorithm
+    SP_MWDC_NLOGN              - Use the n log m algorithm  
+    SP_MWDC_REAL2REAL          - Use FFTW's R2HC and HC2R transforms; should be faster
+    SP_MWDC_NO_MINSIZE         - Don't set a minimum size for the transform in 
+                                 the n log m case
+    SP_MWDC_NO_PADDING         - Don't pad to a power to two
+    SP_MWDC_NO_WISDOM          - Don't try to load FFTW wisdom from system
+    SP_MWDC_DONT_CLEAN_WISDOM  - Don't clean FFTW wisdom after running the match
+    SP_MWDC_FFTW_MEASURE       - Get FFTW to measure plans.
+    SP_MWDC_NO_WILDS_IN_TEXT   - No wilds in the text -- be more efficient
+
+sp_mwdc_match_with_fftw_randomized(): 
+
+    SP_MWDC_VERIFY_NAIVELY (1U << 10) - Verify locations suggested naively
+
+
+sp_mwdc_match_with_flint();  none
+
+
+K-Mismatches
+=========================
+
+void sp_km_naive_kmismatch();
+void sp_km_unbounded_kmismatch();
+
+These take the following parameters:
+
+char *text:   The text you wish to find matches in
+
+char *pattern: The pattern you wish to search for
+
+int n: The length of the text
+
+int m: The length of the pattern
+
+int k: The value of k in k-mismatches
+
+int *numMatches: A pointer to an integer to store the number of results found
+
+struct SP_KM_MATCHING_POSITIONS *listOfMatches: A linked list of integers
+in which to store the results. Stores index of location along with hamming
+distance. Pass NULL to print matching locations instead. The examples detailed 
+above show how to use this.
+
+unsigned int flags: A bitwise OR of operational flags. In both cases, the only
+valid flag is:
+
+	SP_KM_FIRST_MATCH_ONLY (1U << 0) - Stop after finding the first match
+	
+
+Supporting Functions
+=========================
+
+Supporting functions are for creating and destroying result lists. Example usage
+can be seen in the examples detailed above. In general, a standard linked list
+is created. 
+
+For use with matching with don't cares: 
+
+struct SP_MWDC_MATCHING_POSITIONS *sp_mwdc_create_new_list_of_matches();
+void sp_mwdc_freeListOfMatches(struct SP_MWDC_MATCHING_POSITIONS *listOfMatches);
+
+
+For use with k-mismatches: 
+
+struct SP_KM_MATCHING_POSITIONS *sp_km_create_new_list_of_matches();
+void sp_km_freeListOfMatches(struct SP_KM_MATCHING_POSITIONS *listOfMatches);
+	
+
+
