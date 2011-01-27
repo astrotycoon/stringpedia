@@ -1,9 +1,13 @@
-********************************************************************************
+================================================================================
+| ABOUT                                                                        |
+================================================================================
+
 Stringpedia is a project started by Ben Smithers (bs8959 AT bris DOT ac DOT uk)
 under the supervision of Raphael Clifford. It is now in the process of being
 updated by Ross Hemsley (rlhemsley gmail com) to add support for fast 
 k-mismatches.
-********************************************************************************
+
+================================================================================
 
 Work by Ross Hemsley: 
     http://rosshemsley.co.uk
@@ -11,9 +15,9 @@ Work by Ross Hemsley:
 Work by Ben Smithers:
     http://stringpedia.bsmithers.co.uk
 
-********************************************************************************
+================================================================================
 Copyright 2010/2011 Ben Smithers, Ross Hemsley.
-********************************************************************************
+================================================================================
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,4 +32,4 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-********************************************************************************
+================================================================================

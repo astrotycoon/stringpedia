@@ -1,6 +1,6 @@
-==============================================
-|               INSTALLATION                 |
-==============================================
+================================================================================
+| INSTALLATION                                                                 |
+================================================================================
 
 Dependencies:   
 	FFTW 3.2 (http://www.ffftw.org)
@@ -12,9 +12,9 @@ Run: make or
 Run make clean to remove all generated files
      
 
-==============================================
-|             Provided Programs              |
-==============================================
+================================================================================
+| Provided Programs                                                            |
+================================================================================
 
 There are two 'harnesses' provided, which read input from a text file and
 take command line parameters. These will print results and timing information.
@@ -32,9 +32,9 @@ again, run for usage instructions.
 Finally, two simple examples with source code are build and provided in
 examples/
 
-==============================================
-|             Generating Wisdom              |
-==============================================
+================================================================================
+| Generating Wisdom                                                            |
+================================================================================
 
 It is recommended you run wisdomgenerator.sh before using the rest of the 
 code, as this will start generate FFTW wisdom. Note that this is a very 
@@ -43,9 +43,9 @@ all aquired wisdom. This will be improved in future releases. Run
 wisdomgenerator.sh for more information.
 
 
-==============================================
-|                 Usage                      |
-==============================================
+================================================================================
+| Usage                                                                        |
+================================================================================
 
 To use the souce, you will need to:
     include the file: include/stringpedia.h
@@ -53,8 +53,9 @@ To use the souce, you will need to:
     
 Following is a list of functions you may interface with:
 
-Matching With Don't Cares
-=========================
+
+ Matching With Don't Cares
+================================================================================
 
 void sp_mwdc_match_naively();
 void sp_mwdc_match_with_fftw();
@@ -90,10 +91,11 @@ sp_mwdc_match_naively():
 	standard naive method. Academic interest to compare to FLINT library only.
 	
 sp_mwdc_match_with_fftw() : 
-
-	SP_MWDC_NLOGM              - Use the n log n algorithm
+ 
+     SP_MWDC_NLOGM              - Use the n log n algorithm
     SP_MWDC_NLOGN              - Use the n log m algorithm  
-    SP_MWDC_REAL2REAL          - Use FFTW's R2HC and HC2R transforms; should be faster
+    SP_MWDC_REAL2REAL          - Use FFTW's R2HC and HC2R transforms; should be 
+                                 faster
     SP_MWDC_NO_MINSIZE         - Don't set a minimum size for the transform in 
                                  the n log m case
     SP_MWDC_NO_PADDING         - Don't pad to a power to two
@@ -110,8 +112,8 @@ sp_mwdc_match_with_fftw_randomized():
 sp_mwdc_match_with_flint();  none
 
 
-K-Mismatches
-=========================
+ K-Mismatches
+================================================================================
 
 void sp_km_naive_kmismatch();
 void sp_km_unbounded_kmismatch();
@@ -141,8 +143,8 @@ valid flag is:
 	SP_KM_FIRST_MATCH_ONLY (1U << 0) - Stop after finding the first match
 	
 
-Supporting Functions
-=========================
+ Supporting Functions
+================================================================================
 
 Supporting functions are for creating and destroying result lists. Example usage
 can be seen in the examples detailed above. In general, a standard linked list
@@ -159,5 +161,13 @@ For use with k-mismatches:
 struct SP_KM_MATCHING_POSITIONS *sp_km_create_new_list_of_matches();
 void sp_km_freeListOfMatches(struct SP_KM_MATCHING_POSITIONS *listOfMatches);
 	
+================================================================================
+| COPYRIGHT                                                                    |
+================================================================================
+
+Please see attached files ABOUT, and COPYING for relevent information on 
+copying.
+
+================================================================================
 
 
